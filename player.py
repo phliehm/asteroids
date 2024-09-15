@@ -4,8 +4,7 @@ from constants import *
 from shot import *
 
 class Player(CircleShape):
-    containers = ()
-
+    
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
@@ -28,7 +27,8 @@ class Player(CircleShape):
 
     def update(self, dt):
         keys = pygame.key.get_pressed()
-        self.shoot_timer -= dt
+        if self.shoot_timer > 0:
+            self.shoot_timer -= dt
 
         if keys[pygame.K_a]:
             self.rotate(-dt)
@@ -52,6 +52,10 @@ class Player(CircleShape):
             return 
         new_shot = Shot(self.position.x, self.position.y)
         new_shot.velocity = pygame.Vector2(0,1).rotate(self.rotation)
+
+        # shoot from the tip of the spacecraft not the middle
+        new_shot.position += new_shot.velocity.normalize() * PLAYER_RADIUS
+
         new_shot.velocity *= PLAYER_SHOT_SPEED
         self.shoot_timer += PLAYER_SHOOT_COOLDOWN
 
